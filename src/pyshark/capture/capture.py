@@ -355,7 +355,9 @@ class Capture(object):
             output_type = 'psml' if self.only_summaries else 'pdml'
         parameters = [get_tshark_path(self.tshark_path), '-l', '-n', '-T', output_type] + \
                      self.get_parameters(packet_count=packet_count)
-
+        # Drop privileges if requested
+        if os.getenv("TSHARK_USER") is not None:
+            parameters = ['sudo', '-u', os.getenv("TSHARK_USER")] + parameters
         self._log.debug('Creating TShark subprocess with parameters: ' + ' '.join(parameters))
 
         # Ignore stderr output unless in debug mode (sent to console)
